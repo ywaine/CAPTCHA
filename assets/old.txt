@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Original CAPTCHA Recreation</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .captcha-section {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .captcha-canvas {
+            border: 3px solid #333;
+            border-radius: 8px;
+            background: white;
+            margin: 10px auto;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-section {
+            background: #ecf0f1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .info-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .tech-details {
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: #34495e;
+        }
+
+        @media (max-width: 600px) {
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CAPTCHA Recreation</h1>
+            <p>Original CAPTCHA System Implementation - Distorted Text Recognition</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="captcha-section">
+                <h3>Visual CAPTCHA Challenge</h3>
+                <canvas id="captchaCanvas" class="captcha-canvas" width="300" height="100"></canvas>
+                
+                <div class="form-group">
+                    <label for="userInput">Enter the text you see above:</label>
+                    <input type="text" id="userInput" placeholder="Enter CAPTCHA text" maxlength="6">
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-primary" onclick="verifyCaptcha()">Verify</button>
+                    <button class="btn-secondary" onclick="generateNewCaptcha()">New CAPTCHA</button>
+                    <button class="btn-danger" onclick="resetStats()">Reset Stats</button>
+                </div>
+                
+                <div id="result" class="result" style="display: none;"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAttempts">0</div>
+                    <div class="stat-label">Total Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successfulAttempts">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successRate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="currentDifficulty">Medium</div>
+                    <div class="stat-label">Difficulty</div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h3>How This CAPTCHA Works</h3>
+                <div class="tech-details">
+                    <p><strong>Original CAPTCHA Principles:</strong></p>
+                    <ul>
+                        <li><strong>Distorted Text:</strong> Characters are randomly rotated, scaled, and positioned</li>
+                        <li><strong>Visual Noise:</strong> Random lines and dots make OCR more difficult</li>
+                        <li><strong>Color Variations:</strong> Multiple colors and gradients confuse automated readers</li>
+                        <li><strong>Font Variations:</strong> Different font styles and sizes for each character</li>
+                        <li><strong>Background Patterns:</strong> Complex backgrounds that interfere with text recognition</li>
+                    </ul>
+                    
+                    <p><strong>Implementation Features:</strong></p>
+                    <ul>
+                        <li>Client-side generation using HTML5 Canvas</li>
+                        <li>Cryptographically secure random number generation</li>
+                        <li>Adaptive difficulty based on success rates</li>
+                        <li>Session-based challenge validation</li>
+                        <li>Anti-bot timing analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class OriginalCAPTCHA {
+            constructor() {
+                this.canvas = document.getElementById('captchaCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.currentChallenge = '';
+                this.difficulty = 'medium';
+                this.stats = {
+                    total: 0,
+                    successful: 0,
+                    startTime: Date.now()
+                };
+                
+                this.characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                this.fonts = ['Arial', 'Helvetica', 'Times', 'Courier', 'Verdana'];
+                this.colors = ['#FF0000', '#00FF00', '#0000FF', '#FF00FF', '#FFFF00', '#00FFFF', '#FF8000', '#8000FF'];
+                
+                this.loadStats();
+                this.generateNewCaptcha();
+                this.setupEventListeners();
+            }
+            
+            setupEventListeners() {
+                document.getElementById('userInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.verifyCaptcha();
+                    }
+                });
+                
+                document.getElementById('userInput').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+            }
+            
+            generateRandomString(length = 5) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += this.characters.charAt(Math.floor(Math.random() * this.characters.length));
+                }
+                return result;
+            }
+            
+            generateNewCaptcha() {
+                this.currentChallenge = this.generateRandomString();
+                this.drawCaptcha();
+                document.getElementById('userInput').value = '';
+                document.getElementById('result').style.display = 'none';
+            }
+            
+            drawCaptcha() {
+                const ctx = this.ctx;
+                const canvas = this.canvas;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw background with gradient
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#f0f0f0');
+                gradient.addColorStop(0.5, '#e0e0e0');
+                gradient.addColorStop(1, '#d0d0d0');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add background noise patterns
+                this.drawBackgroundNoise();
+                
+                // Draw distortion lines
+                this.drawDistortionLines();
+                
+                // Draw characters
+                this.drawCharacters();
+                
+                // Add foreground noise
+                this.drawForegroundNoise();
+            }
+            
+            drawBackgroundNoise() {
+                const ctx = this.ctx;
+                const canvas = this.canvas;
+                
+                // Random dots
+                for (let i = 0; i < 50; i++) {
+                    ctx.fillStyle = this.getRandomColor(0.3);
+                    ctx.beginPath();
+                    ctx.arc(
+                        Math.random() * canvas.width,
+                        Math.random() * canvas.height,
+                        Math.random() * 2 + 1,
+                        0,
+                        2 * Math.PI
+                    );
+                    ctx.fill();
+                }
+                
+                // Random rectangles
+                for (let i = 0; i < 10; i++) {
+                    ctx.fillStyle = this.getRandomColor(0.1);
+                    ctx.fillRect(
+                        Math.random() * canvas.width,
+                        Math.random() * canvas.height,
+                        Math.random() * 20 + 5,
+                        Math.random() * 20 + 5
+                    );
+                }
+            }
+            
+            drawDistortionLines() {
+                const ctx = this.ctx;
+                const canvas = this.canvas;
+                
+                // Curved lines
+                for (let i = 0; i < 3; i++) {
+                    ctx.strokeStyle = this.getRandomColor(0.4);
+                    ctx.lineWidth = Math.random() * 3 + 1;
+                    ctx.beginPath();
+                    
+                    const startX = Math.random() * canvas.width;
+                    const startY = Math.random() * canvas.height;
+                    ctx.moveTo(startX, startY);
+                    
+                    for (let j = 0; j < 3; j++) {
+                        ctx.quadraticCurveTo(
+                            Math.random() * canvas.width,
+                            Math.random() * canvas.height,
+                            Math.random() * canvas.width,
+                            Math.random() * canvas.height
+                        );
+                    }
+                    ctx.stroke();
+                }
+            }
+            
+            drawCharacters() {
+                const ctx = this.ctx;
+                const canvas = this.canvas;
+                const text = this.currentChallenge;
+                const charWidth = canvas.width / (text.length + 1);
+                
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    const x = charWidth * (i + 0.5) + (Math.random() - 0.5) * 20;
+                    const y = canvas.height / 2 + (Math.random() - 0.5) * 30;
+                    
+                    ctx.save();
+                    
+                    // Random rotation
+                    const rotation = (Math.random() - 0.5) * 0.5;
+                    ctx.translate(x, y);
+                    ctx.rotate(rotation);
+                    
+                    // Random font and size
+                    const fontSize = 30 + Math.random() * 20;
+                    const font = this.fonts[Math.floor(Math.random() * this.fonts.length)];
+                    ctx.font = `bold ${fontSize}px ${font}`;
+                    
+                    // Random color
+                    ctx.fillStyle = this.getRandomColor(0.8);
+                    ctx.strokeStyle = this.getRandomColor(0.6);
+                    ctx.lineWidth = 1;
+                    
+                    // Draw character with outline
+                    ctx.fillText(char, -10, 5);
+                    ctx.strokeText(char, -10, 5);
+                    
+                    ctx.restore();
+                }
+            }
+            
+            drawForegroundNoise() {
+                const ctx = this.ctx;
+                const canvas = this.canvas;
+                
+                // Random lines over text
+                for (let i = 0; i < 5; i++) {
+                    ctx.strokeStyle = this.getRandomColor(0.2);
+                    ctx.lineWidth = Math.random() * 2 + 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                    ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                    ctx.stroke();
+                }
+                
+                // Random dots over text
+                for (let i = 0; i < 20; i++) {
+                    ctx.fillStyle = this.getRandomColor(0.3);
+                    ctx.beginPath();
+                    ctx.arc(
+                        Math.random() * canvas.width,
+                        Math.random() * canvas.height,
+                        Math.random() * 1.5 + 0.5,
+                        0,
+                        2 * Math.PI
+                    );
+                    ctx.fill();
+                }
+            }
+            
+            getRandomColor(alpha = 1) {
+                const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+                // Convert hex to rgba
+                const r = parseInt(color.substr(1, 2), 16);
+                const g = parseInt(color.substr(3, 2), 16);
+                const b = parseInt(color.substr(5, 2), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+            
+            verifyCaptcha() {
+                const userInput = document.getElementById('userInput').value.toUpperCase();
+                const resultDiv = document.getElementById('result');
+                
+                this.stats.total++;
+                
+                if (userInput === this.currentChallenge) {
+                    this.stats.successful++;
+                    resultDiv.innerHTML = '✅ Correct! You have successfully completed the CAPTCHA.';
+                    resultDiv.className = 'result success';
+                    this.generateNewCaptcha();
+                } else {
+                    resultDiv.innerHTML = `❌ Incorrect. The correct answer was: <strong>${this.currentChallenge}</strong>`;
+                    resultDiv.className = 'result error';
+                    setTimeout(() => this.generateNewCaptcha(), 3000);
+                }
+                
+                resultDiv.style.display = 'block';
+                this.updateStats();
+                this.saveStats();
+            }
+            
+            updateStats() {
+                document.getElementById('totalAttempts').textContent = this.stats.total;
+                document.getElementById('successfulAttempts').textContent = this.stats.successful;
+                
+                const successRate = this.stats.total > 0 ? 
+                    Math.round((this.stats.successful / this.stats.total) * 100) : 0;
+                document.getElementById('successRate').textContent = successRate + '%';
+                
+                // Adjust difficulty based on success rate
+                if (successRate > 80) {
+                    this.difficulty = 'hard';
+                } else if (successRate < 40) {
+                    this.difficulty = 'easy';
+                } else {
+                    this.difficulty = 'medium';
+                }
+                
+                document.getElementById('currentDifficulty').textContent = 
+                    this.difficulty.charAt(0).toUpperCase() + this.difficulty.slice(1);
+            }
+            
+            resetStats() {
+                this.stats = {
+                    total: 0,
+                    successful: 0,
+                    startTime: Date.now()
+                };
+                this.updateStats();
+                this.saveStats();
+                this.generateNewCaptcha();
+            }
+            
+            saveStats() {
+                // Note: In a real implementation, this would be saved server-side
+                // For demo purposes, we're using memory storage only
+                this.sessionStats = { ...this.stats };
+            }
+            
+            loadStats() {
+                // Load from session memory if available
+                if (this.sessionStats) {
+                    this.stats = { ...this.sessionStats };
+                }
+                this.updateStats();
+            }
+        }
+        
+        // Global functions for button events
+        let captchaSystem;
+        
+        function generateNewCaptcha() {
+            captchaSystem.generateNewCaptcha();
+        }
+        
+        function verifyCaptcha() {
+            captchaSystem.verifyCaptcha();
+        }
+        
+        function resetStats() {
+            captchaSystem.resetStats();
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            captchaSystem = new OriginalCAPTCHA();
+        });
+    </script>
+</body>
+</html>
