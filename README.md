@@ -1,6 +1,6 @@
-# Original CAPTCHA Recreation - click the link ->
+# Original CAPTCHA Recreation - click the link
 
-A faithful recreation of the original CAPTCHA system based on the groundbreaking research from Carnegie Mellon University.
+A faithful recreation of the original CAPTCHA system based on the groundbreaking research from Carnegie Mellon University.  [The link](https://ywaine.github.io/CAPTCHA-remake/)
 
 ## Market & Background
 This is a recreation of the original CAPTCHA. Performing a lifetime digitization of 14 years in transcription of books worth $6.1 Billion in wages. Solved by humans 99.6% of the time in under 30 seconds. At a rate of solving services for as low as US$0.50 per 1000 solved CAPTCHAs. The retail price for solving one million CAPTCHAs was only as low as $1,000
