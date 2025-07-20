@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Original CAPTCHA Recreation</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CAPTCHA Recreation</h1>
+            <p>Original CAPTCHA System Implementation - Distorted Text Recognition</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="captcha-section">
+                <h3>Visual CAPTCHA Challenge</h3>
+                <canvas id="captchaCanvas" class="captcha-canvas" width="300" height="100"></canvas>
+                
+                <div class="form-group">
+                    <label for="userInput">Enter the text you see above:</label>
+                    <input type="text" id="userInput" placeholder="Enter CAPTCHA text" maxlength="6">
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-primary" id="verifyBtn">Verify</button>
+                    <button class="btn-secondary" id="newCaptchaBtn">New CAPTCHA</button>
+                    <button class="btn-danger" id="resetStatsBtn">Reset Stats</button>
+                </div>
+                
+                <div id="result" class="result" style="display: none;"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAttempts">0</div>
+                    <div class="stat-label">Total Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successfulAttempts">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successRate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="currentDifficulty">Medium</div>
+                    <div class="stat-label">Difficulty</div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h3>How This CAPTCHA Works</h3>
+                <div class="tech-details">
+                    <p><strong>Original CAPTCHA Principles:</strong></p>
+                    <ul>
+                        <li><strong>Distorted Text:</strong> Characters are randomly rotated, scaled, and positioned</li>
+                        <li><strong>Visual Noise:</strong> Random lines and dots make OCR more difficult</li>
+                        <li><strong>Color Variations:</strong> Multiple colors and gradients confuse automated readers</li>
+                        <li><strong>Font Variations:</strong> Different font styles and sizes for each character</li>
+                        <li><strong>Background Patterns:</strong> Complex backgrounds that interfere with text recognition</li>
+                    </ul>
+                    
+                    <p><strong>Implementation Features:</strong></p>
+                    <ul>
+                        <li>Client-side generation using HTML5 Canvas</li>
+                        <li>Cryptographically secure random number generation</li>
+                        <li>Adaptive difficulty based on success rates</li>
+                        <li>Session-based challenge validation</li>
+                        <li>Anti-bot timing analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/captcha.js"></script>
+</body>
+</html>
