@@ -1,4 +1,4 @@
-# Original CAPTCHA Recreation
+# Original CAPTCHA Recreation - click the link ->
 
 A faithful recreation of the original CAPTCHA system based on the groundbreaking research from Carnegie Mellon University.
 
